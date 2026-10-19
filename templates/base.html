@@ -17,8 +17,10 @@
                     <small>Murang'a County</small>
                 </div>
             </a>
+
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
             
-            <nav class="nav-links">
+            <nav class="nav-links" id="navLinks">
                 <a href="/">Home</a>
                 
                 {% if current_user %}
@@ -58,5 +60,15 @@
             <p>&copy; {{ year }} Murang'a County Government. All rights reserved.</p>
         </div>
     </footer>
+
+    <script>
+        const navToggle = document.getElementById('navToggle');
+        const navLinks = document.getElementById('navLinks');
+        if (navToggle && navLinks) {
+            navToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('open');
+            });
+        }
+    </script>
 </body>
 </html>
