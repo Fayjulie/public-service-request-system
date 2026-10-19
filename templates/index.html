@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="ecitizen-hero" style="padding: 3rem 0 1.5rem 0;">
+    <div class="container">
+        <h1 style="font-size: 2.5rem;">Government of Murang'a</h1>
+        <p class="hero-subtitle" style="font-size: 1.2rem; margin-bottom: 1rem;">purpose to serve its citizens</p>
+        <p class="hero-desc" style="font-size: 0.95rem; margin-bottom: 1.5rem; max-width: 600px;">Access government services quickly, securely, and conveniently.</p>
+        
+        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+            <a href="{{ url_for('login') }}" style="width: 200px; text-align: center; background: #2563EB; color: white; padding: 0.8rem; border-radius: 8px; font-weight: 600; font-size: 1rem; text-decoration: none; transition: 0.2s; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);" onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563EB'">
+                Citizen Login
+            </a>
+            <a href="{{ url_for('admin_login') }}" style="width: 200px; text-align: center; background: #0B7A43; color: white; padding: 0.8rem; border-radius: 8px; font-weight: 600; font-size: 1rem; text-decoration: none; transition: 0.2s; box-shadow: 0 4px 6px rgba(11, 122, 67, 0.2);" onmouseover="this.style.background='#063D22'" onmouseout="this.style.background='#0B7A43'">
+                Admin Portal
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="container quick-services-grid" style="margin: 1.5rem auto;">
+    <a href="{{ url_for('new_request') }}" class="service-card" style="padding: 1.2rem 0.5rem;">
+        <div class="service-icon" style="font-size: 2rem;">💡</div>
+        <span style="font-size: 0.85rem;">Streetlight</span>
+    </a>
+    <a href="{{ url_for('new_request') }}" class="service-card" style="padding: 1.2rem 0.5rem;">
+        <div class="service-icon" style="font-size: 2rem;">💧</div>
+        <span style="font-size: 0.85rem;">Water</span>
+    </a>
+    <a href="{{ url_for('new_request') }}" class="service-card" style="padding: 1.2rem 0.5rem;">
+        <div class="service-icon" style="font-size: 2rem;">🗑️</div>
+        <span style="font-size: 0.85rem;">Garbage</span>
+    </a>
+    <a href="{{ url_for('new_request') }}" class="service-card" style="padding: 1.2rem 0.5rem;">
+        <div class="service-icon" style="font-size: 2rem;">🛡️</div>
+        <span style="font-size: 0.85rem;">Security</span>
+    </a>
+    <a href="{{ url_for('new_request') }}" class="service-card" style="padding: 1.2rem 0.5rem;">
+        <div class="service-icon" style="font-size: 2rem;">📝</div>
+        <span style="font-size: 0.85rem;">Other</span>
+    </a>
+</section>
+
+<section class="container how-it-works" style="padding: 1.5rem 1rem; margin-bottom: 2rem;">
+    <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem;">How It Works</h2>
+    <div class="steps-grid" style="gap: 1rem;">
+        <div class="step-card" style="padding: 1.2rem;">
+            <div class="step-icon" style="width: 35px; height: 35px; font-size: 1rem; margin-bottom: 0.8rem;">1</div>
+            <h3 style="font-size: 1rem;">Create Account</h3>
+            <p style="font-size: 0.85rem;">Register with your phone.</p>
+        </div>
+        <div class="step-card" style="padding: 1.2rem;">
+            <div class="step-icon" style="width: 35px; height: 35px; font-size: 1rem; margin-bottom: 0.8rem;">2</div>
+            <h3 style="font-size: 1rem;">Submit Request</h3>
+            <p style="font-size: 0.85rem;">Choose category and location.</p>
+        </div>
+        <div class="step-card" style="padding: 1.2rem;">
+            <div class="step-icon" style="width: 35px; height: 35px; font-size: 1rem; margin-bottom: 0.8rem;">3</div>
+            <h3 style="font-size: 1rem;">Track Updates</h3>
+            <p style="font-size: 0.85rem;">Follow status with your Ref No.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

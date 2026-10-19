@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container" style="max-width: 550px; padding-top: 2rem; padding-bottom: 2rem;">
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div style="background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; overflow: hidden;">
+        
+        <div style="background: linear-gradient(135deg, #0B7A43 0%, #063D22 100%); padding: 2rem 1rem 1.5rem 1rem; text-align: center; color: white; position: relative;">
+            
+            <div style="position: relative; width: 120px; height: 120px; margin: 0 auto 0.5rem auto;">
+                <div style="width: 100%; height: 100%; border-radius: 50%; background: white; overflow: hidden; border: 4px solid rgba(255,255,255,0.3);">
+                    {% if current_user.profile_photo %}
+                        <img src="{{ url_for('static', filename='uploads/' + current_user.profile_photo) }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                        <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #f1f5f9; color: #94a3b8; font-size: 3rem;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <h2 style="margin: 0; font-size: 1.4rem;">{{ current_user.full_name }}</h2>
+            <p style="margin: 0.2rem 0 0 0; opacity: 0.9; font-size: 0.85rem;">{{ current_user.email }}</p>
+
+            <div style="margin-top: 1rem; display: flex; justify-content: center; gap: 0.8rem;">
+                <form method="POST" action="{{ url_for('update_profile') }}" enctype="multipart/form-data" style="display: inline;">
+                    <label for="profile_upload" style="background: rgba(255,255,255,0.2); color: white; padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: 0.2s;">
+                        <i class="fas fa-camera"></i> Change Photo
+                    </label>
+                    <input type="file" id="profile_upload" name="profile_photo" accept="image/*" style="display: none;" onchange="this.form.submit()">
+                </form>
+
+                {% if current_user.profile_photo %}
+                <form method="POST" action="{{ url_for('remove_profile_photo') }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to remove your profile photo?');">
+                    <button type="submit" style="background: rgba(239, 68, 68, 0.2); color: #fecaca; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: 0.2s;">
+                        <i class="fas fa-trash"></i> Remove Photo
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="padding: 1.5rem;">
+            <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem; color: #0f172a; font-size: 1.1rem;">My Details</h3>
+            
+            <div style="display: flex; justify-content: space-between; padding: 0.6rem 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem;">
+                <span style="color: #64748b; font-weight: 500;">Full Name</span>
+                <span style="font-weight: 600; color: #0f172a;">{{ current_user.full_name }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 0.6rem 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem;">
+                <span style="color: #64748b; font-weight: 500;">Phone Number</span>
+                <span style="font-weight: 600; color: #0f172a;">{{ current_user.phone or 'N/A' }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 0.6rem 0; font-size: 0.9rem;">
+                <span style="color: #64748b; font-weight: 500;">Email Address</span>
+                <span style="font-weight: 600; color: #0f172a;">{{ current_user.email }}</span>
+            </div>
+
+            <div style="margin-top: 1.5rem; padding: 1rem; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px;">
+                <h4 style="margin: 0 0 0.5rem 0; color: #475569; font-size: 0.9rem;"><i class="fas fa-info-circle"></i> Please Note</h4>
+                <p style="color: #64748b; font-size: 0.8rem; margin-bottom: 0.8rem; line-height: 1.4;">
+                    Deleting your account will permanently remove all your submitted requests. This action cannot be undone.
+                </p>
+                <form method="POST" action="{{ url_for('delete_account') }}" onsubmit="return confirm('Are you sure you want to delete your account permanently?');">
+                    <button type="submit" style="background: transparent; color: #ef4444; border: 1px solid #ef4444; padding: 0.4rem 1rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='#ef4444'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='#ef4444'">
+                        Delete Account
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

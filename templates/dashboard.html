@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .dashboard-wrapper {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+    }
+    
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-box {
+        background: white;
+        padding: 1.2rem;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    
+    .stat-box h4 {
+        margin: 0 0 0.3rem 0;
+        font-size: 0.75rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .stat-box h2 {
+        margin: 0;
+        font-size: 1.8rem;
+        color: #0f172a;
+        font-weight: 800;
+    }
+    
+    .stat-box.pending { border-top: 4px solid #f59e0b; }
+    .stat-box.progress { border-top: 4px solid #3b82f6; }
+    .stat-box.resolved { border-top: 4px solid #10b981; }
+    .stat-box.total { border-top: 4px solid #0B7A43; }
+
+    .req-card {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    
+    .req-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 6px;
+        border-radius: 12px 0 0 12px;
+        background: #cbd5e1;
+    }
+    
+    .req-card.status-pending::before { background: #f59e0b; }
+    .req-card.status-in-progress::before { background: #3b82f6; }
+    .req-card.status-resolved::before { background: #10b981; }
+
+    .progress-bar-container {
+        display: flex;
+        gap: 4px;
+        height: 8px;
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .progress-segment {
+        flex: 1;
+        background: #f1f5f9;
+        border-radius: 4px;
+    }
+    
+    .progress-segment.completed { background: #0B7A43; }
+
+    .updates-box {
+        margin-top: 1.5rem;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+    
+    .updates-box h4 {
+        margin: 0 0 0.8rem 0;
+        font-size: 0.8rem;
+        color: #0B7A43;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .update-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 0.6rem;
+        font-size: 0.9rem;
+        color: #334155;
+    }
+    
+    .update-item:last-child { margin-bottom: 0; }
+    
+    .update-item i { margin-top: 3px; color: #64748b; }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .page-btn {
+        padding: 0.6rem 1.2rem;
+        background: white;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        color: #334155;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: 0.2s;
+    }
+
+    .page-btn:hover {
+        background: #f8fafc;
+        border-color: #0B7A43;
+        color: #0B7A43;
+    }
+
+    .page-info {
+        color: #64748b;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    
+    @media (max-width: 768px) {
+        .stats-row { grid-template-columns: repeat(2, 1fr); }
+        .dashboard-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    }
+</style>
+
+<div class="dashboard-wrapper">
+    
+    <div class="dashboard-header">
+        <div>
+            <h1 style="font-size: 1.8rem; color: #0f172a; margin-bottom: 0.3rem;">Hello, {{ current_user.full_name.split()[0] }} 👋</h1>
+            <p style="color: #64748b; font-size: 0.95rem; margin: 0;">You have <strong>{{ stats.pending + stats.progress }}</strong> active request(s).</p>
+        </div>
+        <a href="{{ url_for('new_request') }}" class="btn-primary" style="padding: 0.6rem 1.2rem;">+ New Request</a>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-box total">
+            <h4>Total</h4>
+            <h2>{{ stats.total }}</h2>
+        </div>
+        <div class="stat-box pending">
+            <h4>Pending</h4>
+            <h2 style="color: #f59e0b;">{{ stats.pending }}</h2>
+        </div>
+        <div class="stat-box progress">
+            <h4>In Progress</h4>
+            <h2 style="color: #3b82f6;">{{ stats.progress }}</h2>
+        </div>
+        <div class="stat-box resolved">
+            <h4>Resolved</h4>
+            <h2 style="color: #10b981;">{{ stats.resolved }}</h2>
+        </div>
+    </div>
+
+    {% if requests %}
+        <div class="request-list">
+        {% for r in requests %}
+            <div class="req-card status-{{ r.status|lower|replace(' ', '-') }}">
+                
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                    <div>
+                        <span style="display: inline-block; font-size: 0.75rem; padding: 0.2rem 0.6rem; background: #f1f5f9; border-radius: 4px; font-weight: 700; color: #334155; margin-bottom: 0.4rem;">{{ r.reference }}</span>
+                        <h3 style="font-size: 1.2rem; margin: 0 0 0.3rem 0; color: #0f172a;">{{ r.title }}</h3>
+                        <p style="margin: 0; font-size: 0.85rem; color: #64748b;">📍 {{ r.location }} | 🕒 Submitted: {{ r.created_at }}</p>
+                    </div>
+                    <span class="badge badge-{{ r.status|lower|replace(' ', '-') }}" style="font-size: 0.85rem; padding: 0.4rem 1rem;">{{ r.status }}</span>
+                </div>
+
+                <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600; color: #64748b; margin-bottom: 0.3rem;">
+                        <span>Pending</span>
+                        <span>In Progress</span>
+                        <span>Resolved</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        {% if r.status == 'Pending' %}
+                            <div class="progress-segment completed"></div>
+                            <div class="progress-segment"></div>
+                            <div class="progress-segment"></div>
+                        {% elif r.status == 'In Progress' %}
+                            <div class="progress-segment completed"></div>
+                            <div class="progress-segment completed"></div>
+                            <div class="progress-segment"></div>
+                        {% else %}
+                            <div class="progress-segment completed"></div>
+                            <div class="progress-segment completed"></div>
+                            <div class="progress-segment completed"></div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="updates-box">
+                    <h4>Updates from Murang'a Team</h4>
+                    
+                    {% if r.timeline %}
+                        <div class="update-item">
+                            <i class="fas fa-clock" style="color: #0B7A43;"></i>
+                            <span><strong>Expected Resolution:</strong> {{ r.timeline }}</span>
+                        </div>
+                    {% endif %}
+                    
+                    {% if r.admin_note %}
+                        <div class="update-item">
+                            <i class="fas fa-sticky-note"></i>
+                            <span><strong>Admin Note:</strong> {{ r.admin_note }}</span>
+                        </div>
+                    {% endif %}
+                    
+                    {% if not r.timeline and not r.admin_note %}
+                        <div class="update-item" style="color: #94a3b8; font-style: italic;">
+                            <i class="fas fa-hourglass-half"></i>
+                            <span>Awaiting admin review...</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+
+        {% if total_pages > 1 %}
+        <div class="pagination">
+            {% if current_page > 1 %}
+                <a href="{{ url_for('dashboard', page=current_page - 1) }}" class="page-btn">&larr; Previous</a>
+            {% else %}
+                <span class="page-btn" style="opacity: 0.5; cursor: not-allowed;">&larr; Previous</span>
+            {% endif %}
+            
+            <span class="page-info">Page {{ current_page }} of {{ total_pages }}</span>
+            
+            {% if current_page < total_pages %}
+                <a href="{{ url_for('dashboard', page=current_page + 1) }}" class="page-btn">Next &rarr;</a>
+            {% else %}
+                <span class="page-btn" style="opacity: 0.5; cursor: not-allowed;">Next &rarr;</span>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    {% else %}
+        <div style="background: white; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 3rem 1rem; text-align: center;">
+            <h2 style="color: #0f172a; margin-bottom: 0.5rem; font-size: 1.5rem;">No requests yet</h2>
+            <p style="color: #64748b; margin-bottom: 1.5rem;">You haven't submitted any service requests.</p>
+            <a href="{{ url_for('new_request') }}" class="btn-primary" style="padding: 0.8rem 2rem;">Submit Your First Request</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Murang'a County Government</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="navbar">
+        <div class="container nav-container">
+            <a href="/" class="brand">
+                <img src="https://flagcdn.com/w80/ke.png" alt="Kenya Flag" style="height: 35px; border-radius: 4px;">
+                <div class="brand-text">
+                    <span class="green">e</span>Citizen
+                    <small>Murang'a County</small>
+                </div>
+            </a>
+            
+            <nav class="nav-links">
+                <a href="/">Home</a>
+                
+                {% if current_user %}
+                    {% if current_user.is_admin %}
+                        <a href="{{ url_for('admin_dashboard') }}" style="color: var(--primary); font-weight: 700; background: var(--bg-light); padding: 0.4rem 1rem; border-radius: 6px;">Admin Panel</a>
+                    {% else %}
+                        <a href="{{ url_for('dashboard') }}">My Dashboard</a>
+                        <a href="{{ url_for('new_request') }}">New Request</a>
+                        <a href="{{ url_for('profile') }}">My Profile</a>
+                    {% endif %}
+                    
+                    <a href="{{ url_for('logout') }}" style="color: var(--red); font-weight: 700; margin-left: 1rem; padding: 0.4rem 0.8rem; border: 2px solid var(--red); border-radius: 6px; transition: 0.2s;" onmouseover="this.style.background='var(--red)'; this.style.color='white';" onmouseout="this.style.background='transparent'; this.style.color='var(--red)';">Logout</a>
+                    
+                {% else %}
+                    <a href="{{ url_for('login') }}">Login</a>
+                    <a href="{{ url_for('new_request') }}" class="btn-primary" style="padding: 0.4rem 1rem; margin-left: 1rem;">Report Issue</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="container" style="margin-top: 1rem;">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="container" style="text-align: center; padding: 2rem 0; color: var(--grey-text); border-top: 1px solid var(--border); margin-top: 3rem;">
+            <p>&copy; {{ year }} Murang'a County Government. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

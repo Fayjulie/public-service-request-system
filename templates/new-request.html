@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container" style="max-width: 700px; padding-top: 2rem; padding-bottom: 2rem;">
+    
+    <div style="margin-bottom: 1.5rem; text-align: center;">
+        <h1 style="font-size: 1.8rem; color: #0f172a;">Submit New Request</h1>
+        <p style="color: var(--grey-text); font-size: 0.9rem;">Step 1 of 1</p>
+    </div>
+    
+    <form method="POST" enctype="multipart/form-data" class="card-form" style="padding: 2rem; background: white; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border);">
+        
+        <div class="form-group">
+            <label>Category *</label>
+            <select name="category" required>
+                <option value="" disabled selected>Select category</option>
+                {% for c in CATEGORIES %}
+                    <option value="{{ c }}">{{ c }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Title *</label>
+            <input type="text" name="title" required placeholder="e.g. Streetlight not working at Kiharu Market">
+        </div>
+
+        <div class="form-group">
+            <label>Ward *</label>
+            <select name="ward" required>
+                <option value="" disabled selected>Select your Ward</option>
+                {% for ward in WARDS %}
+                    <option value="{{ ward }}">{{ ward }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Specific Location *</label>
+            <input type="text" name="location" required placeholder="e.g. Near the main market">
+        </div>
+        
+        <div class="form-group">
+            <label>Description *</label>
+            <textarea name="description" required rows="3" placeholder="Describe the problem..."></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label>Upload Photo (Optional)</label>
+            <div class="upload-box" style="padding: 1.5rem;">
+                <input type="file" name="image" accept="image/*">
+                <p style="margin-top: 0.5rem; color: var(--grey-text); font-size: 0.9rem;">Click to upload photo</p>
+            </div>
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 1rem;">
+            <label>Phone for updates</label>
+            <input type="tel" name="phone" value="{{ current_user.phone or '' }}" placeholder="e.g. 0712345678">
+        </div>
+        
+        <button type="submit" class="btn-primary btn-block btn-lg">Submit Request →</button>
+    </form>
+</div>
+{% endblock %}

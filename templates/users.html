@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <h3>Admin Panel</h3>
+        <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+        <a href="#">All Requests</a>
+        <a href="{{ url_for('admin_users') }}" class="active">Users</a>
+        <a href="{{ url_for('logout') }}" style="margin-top: auto; color: red;">Logout</a>
+    </aside>
+
+    <div class="admin-main">
+        <h1 style="margin-top: 0;">Registered Citizens</h1>
+        <p style="color: #64748b; margin-bottom: 2rem;">View all citizens who have signed up for the platform.</p>
+
+        <div class="card-form" style="padding: 0; overflow: hidden;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Citizen ID</th>
+                        <th>Full Name</th>
+                        <th>Email Address</th>
+                        <th>Phone Number</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td><strong style="color: var(--primary);">#{{ u.id }}</strong></td>
+                        <td>{{ u.full_name }}</td>
+                        <td>{{ u.email }}</td>
+                        <td>{{ u.phone or 'N/A' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: #94a3b8; padding: 2rem;">
+                            No citizens have registered yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
