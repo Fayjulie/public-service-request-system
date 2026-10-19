@@ -4,7 +4,7 @@
     <aside class="admin-sidebar">
         <h3>Admin Panel</h3>
         <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
-        <a href="#">All Requests</a>
+        <a href="{{ url_for('admin_dashboard') }}">All Requests</a>
         <a href="{{ url_for('admin_users') }}" class="active">Users</a>
         <a href="{{ url_for('logout') }}" style="margin-top: auto; color: red;">Logout</a>
     </aside>
