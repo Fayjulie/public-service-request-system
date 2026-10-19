@@ -11,11 +11,15 @@ app = Flask(__name__)
 app.secret_key = "muranga-county-secret-key"
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
-INSTANCE_DIR = os.path.join(BASE_DIR, "instance")
-DATABASE = os.path.join(INSTANCE_DIR, "muranga.db")
+
+if os.environ.get('RENDER'):
+    DATABASE = "/tmp/muranga.db"
+else:
+    INSTANCE_DIR = os.path.join(BASE_DIR, "instance")
+    os.makedirs(INSTANCE_DIR, exist_ok=True)
+    DATABASE = os.path.join(INSTANCE_DIR, "muranga.db")
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs(INSTANCE_DIR, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 CATEGORIES = ["Broken Streetlight", "Water Issue", "Garbage Collection", "Road / Pothole", "Security Issue", "Other"]
@@ -35,35 +39,37 @@ def close_db(exception):
         db.close()
 
 def init_db():
-    with app.app_context():
-        db = get_db()
-        db.executescript('''
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                full_name TEXT NOT NULL,
-                phone TEXT,
-                email TEXT UNIQUE NOT NULL,
-                password_hash TEXT NOT NULL,
-                profile_photo TEXT,
-                is_admin BOOLEAN DEFAULT 0
-            );
-            CREATE TABLE IF NOT EXISTS requests (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reference TEXT UNIQUE NOT NULL,
-                user_id INTEGER NOT NULL,
-                category TEXT NOT NULL,
-                title TEXT NOT NULL,
-                location TEXT NOT NULL,
-                description TEXT NOT NULL,
-                image TEXT,
-                status TEXT DEFAULT 'Pending',
-                timeline TEXT,
-                admin_note TEXT,
-                created_at TEXT NOT NULL,
-                FOREIGN KEY (user_id) REFERENCES users(id)
-            );
-        ''')
-        db.commit()
+    db = sqlite3.connect(DATABASE)
+    db.executescript('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            full_name TEXT NOT NULL,
+            phone TEXT,
+            email TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            profile_photo TEXT,
+            is_admin BOOLEAN DEFAULT 0
+        );
+        CREATE TABLE IF NOT EXISTS requests (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            reference TEXT UNIQUE NOT NULL,
+            user_id INTEGER NOT NULL,
+            category TEXT NOT NULL,
+            title TEXT NOT NULL,
+            location TEXT NOT NULL,
+            description TEXT NOT NULL,
+            image TEXT,
+            status TEXT DEFAULT 'Pending',
+            timeline TEXT,
+            admin_note TEXT,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        );
+    ''')
+    db.commit()
+    db.close()
+
+init_db()
 
 def login_required(f):
     @wraps(f)
@@ -321,5 +327,4 @@ def update_status(id):
     return redirect(url_for('admin_dashboard'))
 
 if __name__ == '__main__':
-    init_db()
     app.run(debug=True)
