@@ -66,6 +66,11 @@ def init_db():
             FOREIGN KEY (user_id) REFERENCES users(id)
         );
     ''')
+    
+    if db.execute('SELECT COUNT(*) FROM users').fetchone()[0] == 0:
+        db.execute('INSERT INTO users (full_name, email, phone, password_hash, is_admin) VALUES (?, ?, ?, ?, ?)',
+                   ('Admin Muranga', 'admin.muranga@gmail.com', '+254711223344', generate_password_hash('Admin@12345'), 1))
+    
     db.commit()
     db.close()
 
@@ -137,19 +142,10 @@ def admin_login():
             
     return render_template('admin_login.html')
 
-@app.route('/make-me-admin/<email>')
-def make_me_admin(email):
-    db = get_db()
-    db.execute("UPDATE users SET is_admin = 1 WHERE email = ?", (email,))
-    db.commit()
-    flash(f"Success! {email} is now an Admin. Please log in again.", "success")
-    return redirect(url_for('admin_login'))
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         password = request.form['password']
-        role = request.form.get('role', 'citizen')
         
         if password != request.form['confirm_password']:
             flash("Passwords do not match.", "error")
@@ -161,11 +157,10 @@ def register():
             
         try:
             db = get_db()
-            is_admin = 1 if role == 'admin' else 0
-            db.execute("INSERT INTO users (full_name, phone, email, password_hash, is_admin) VALUES (?, ?, ?, ?, ?)",
-                       (request.form['full_name'], request.form['phone'], request.form['email'], generate_password_hash(password), is_admin))
+            db.execute("INSERT INTO users (full_name, phone, email, password_hash) VALUES (?, ?, ?, ?)",
+                       (request.form['full_name'], request.form['phone'], request.form['email'], generate_password_hash(password)))
             db.commit()
-            flash(f"{'Admin' if is_admin else 'Citizen'} account created! Please log in.", "success")
+            flash("Citizen account created! Please log in.", "success")
             return redirect(url_for('login'))
         except sqlite3.IntegrityError:
             flash("Email already exists.", "error")
@@ -298,7 +293,7 @@ def delete_account():
 @admin_required
 def admin_dashboard():
     db = get_db()
-    all_reqs = db.execute("SELECT r.*, u.full_name, u.phone FROM requests r JOIN users u ON r.user_id = u.id ORDER BY r.id DESC LIMIT 50").fetchall()
+    all_reqs = db.execute("SELECT r.*, u.full_name, u.phone FROM requests r JOIN users u ON r.user_id = u.id ORDER BY r.id DESC").fetchall()
     
     total_count = db.execute("SELECT COUNT(*) FROM requests").fetchone()[0]
     resolved = db.execute("SELECT COUNT(*) FROM requests WHERE status='Resolved'").fetchone()[0]
