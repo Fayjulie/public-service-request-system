@@ -157,7 +157,7 @@ def register():
             
         try:
             db = get_db()
-            db.execute("INSERT INTO users (full_name, phone, email, password_hash) VALUES (?, ?, ?, ?)",
+            db.execute("INSERT INTO users (full_name, phone, email, password_hash, is_admin) VALUES (?, ?, ?, ?, 0)",
                        (request.form['full_name'], request.form['phone'], request.form['email'], generate_password_hash(password)))
             db.commit()
             flash("Citizen account created! Please log in.", "success")
